@@ -114,7 +114,13 @@ const LoginForm = () => {
       toast.success("Login realizado com sucesso!");
       router.push("/dashboard");
     } catch (err) {
-      toast.error("Erro inesperado ao fazer login: " + (err?.message || err));
+      let errorMsg = '';
+      if (err && typeof err === 'object' && 'message' in err) {
+        errorMsg = (err as any).message;
+      } else {
+        errorMsg = String(err);
+      }
+      toast.error("Erro inesperado ao fazer login: " + errorMsg);
       console.error("[LOGIN] Erro inesperado:", err);
     }
   };
