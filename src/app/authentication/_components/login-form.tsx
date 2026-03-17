@@ -84,21 +84,32 @@ const LoginForm = () => {
         body: JSON.stringify(normalizedUser),
       });
 
-      if (!sessionResponse.ok) {
-        const responseBody = (await sessionResponse.json().catch(() => null)) as
-          | { error?: string }
-          | null;
+      let responseText = await sessionResponse.text();
+      let responseBody;
+      try {
+        responseBody = JSON.parse(responseText);
+      } catch (e) {
+        responseBody = null;
+      }
+      console.log("[LOGIN] Resposta do endpoint:", responseText);
 
+      if (!sessionResponse.ok) {
         toast.error(responseBody?.error || "Falha ao criar sessão de acesso.");
         return;
       }
 
-      localStorage.setItem("user", JSON.stringify(normalizedUser));
+      try {
+        localStorage.setItem("user", JSON.stringify(normalizedUser));
+      } catch (storageError) {
+        toast.error("Erro ao salvar usuário no localStorage: " + (storageError?.message || storageError));
+        return;
+      }
 
       toast.success("Login realizado com sucesso!");
       router.push("/dashboard");
-    } catch {
-      toast.error("Erro inesperado ao fazer login.");
+    } catch (err) {
+      toast.error("Erro inesperado ao fazer login: " + (err?.message || err));
+      console.error("[LOGIN] Erro inesperado:", err);
     }
   };
 
