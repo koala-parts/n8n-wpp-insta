@@ -12,6 +12,7 @@ type LoginBody = {
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as LoginBody;
+    console.log("[LOGIN] body recebido:", body);
 
     const userId = body?.id ? String(body.id).trim() : "";
     const email = body?.email?.trim() ?? "";
@@ -19,22 +20,35 @@ export async function POST(request: Request) {
     const role = body?.role?.trim() || "atendimento";
 
     if (!userId || !email) {
+      console.log("[LOGIN] Dados incompletos:", { userId, email });
       return NextResponse.json({ error: "Dados incompletos" }, { status: 400 });
     }
 
-    const token = await createSessionToken({
-      sub: userId,
-      name,
-      role,
-      email,
-    });
+    let token;
+    try {
+      token = await createSessionToken({
+        sub: userId,
+        name,
+        role,
+        email,
+      });
+      console.log("[LOGIN] Token gerado:", token);
+    } catch (tokenError) {
+      console.log("[LOGIN] Erro ao gerar token:", tokenError);
+      throw tokenError;
+    }
 
-    const response = NextResponse.json({ ok: true });
-    response.cookies.set("session", token, getSessionCookieOptions());
-    return response;
+    try {
+      const response = NextResponse.json({ ok: true });
+      response.cookies.set("session", token, getSessionCookieOptions());
+      console.log("[LOGIN] Cookie setado com sucesso.");
+      return response;
+    } catch (cookieError) {
+      console.log("[LOGIN] Erro ao setar cookie:", cookieError);
+      throw cookieError;
+    }
   } catch (error) {
     console.error("Session login error:", error);
-
     return NextResponse.json(
       {
         error:
