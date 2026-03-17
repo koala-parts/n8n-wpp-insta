@@ -101,7 +101,13 @@ const LoginForm = () => {
       try {
         localStorage.setItem("user", JSON.stringify(normalizedUser));
       } catch (storageError) {
-        toast.error("Erro ao salvar usuário no localStorage: " + (storageError?.message || storageError));
+        let errorMsg = '';
+        if (storageError && typeof storageError === 'object' && 'message' in storageError) {
+          errorMsg = (storageError as any).message;
+        } else {
+          errorMsg = String(storageError);
+        }
+        toast.error("Erro ao salvar usuário no localStorage: " + errorMsg);
         return;
       }
 
