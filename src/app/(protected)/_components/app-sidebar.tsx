@@ -58,6 +58,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { toast } from "sonner";
+import { MessageTemplatesSheet } from "@/app/(protected)/chats/components/message-templates-sheet";
 
 const items = [
   {
@@ -193,6 +194,7 @@ export function AppSidebar() {
   const [processingRequestKey, setProcessingRequestKey] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [templatesOpen, setTemplatesOpen] = useState(false);
 
   const pendingNotifications = notifications.filter(
     (notification) => !readNotificationKeys.has(notification.readKey)
@@ -677,6 +679,18 @@ export function AppSidebar() {
           <SidebarGroupContent className="border-t pt-3">
             <SidebarMenu>
               <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between"
+                    onClick={() => setTemplatesOpen(true)}
+                    aria-label="Configurações de modelos de mensagem"
+                  >
+                    <span>Configurações</span>
+                  </button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
                   isActive={isItemActive("/help")}
@@ -901,6 +915,12 @@ export function AppSidebar() {
         )}
       </SheetContent>
     </Sheet>
+    <MessageTemplatesSheet
+      open={templatesOpen}
+      onOpenChange={setTemplatesOpen}
+      userId={user?.id ?? ""}
+      mode="manage"
+    />
     </>
   );
 }

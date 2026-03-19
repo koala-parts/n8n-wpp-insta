@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Send, Wand2 } from "lucide-react";
+import { FileText, Loader2, Send, StickyNote, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { AISuggestionsDialog } from "./ai-suggestions-dialog";
 import { AiPromptDialog } from "./ai-prompt-dialog";
+import { ChatNotesDialog } from "./chat-notes-dialog";
+import { MessageTemplatesSheet } from "./message-templates-sheet";
 
 function getStoredUser() {
 	try {
@@ -43,6 +45,15 @@ export function MessageInput({
 	const [aiPromptOpen, setAiPromptOpen] = useState(false);
 	const [aiSuggestionsOpen, setAiSuggestionsOpen] = useState(false);
 	const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
+	const [notesOpen, setNotesOpen] = useState(false);
+	const [templatesOpen, setTemplatesOpen] = useState(false);
+
+	const storedUser = useMemo(() => getStoredUser(), []);
+
+	const effectiveUserName =
+		typeof userName === "string" && userName.trim()
+			? userName.trim()
+			: storedUser?.name ?? "";
 
 	const handleSendMessage = async () => {
 		if (!message.trim()) {
@@ -52,7 +63,6 @@ export function MessageInput({
 
 		try {
 			setSending(true);
-			const storedUser = getStoredUser();
 			const normalizedSenderName =
 				typeof userName === "string" && userName.trim()
 					? userName.trim()
@@ -141,6 +151,16 @@ export function MessageInput({
 		setMessage(suggestion);
 	};
 
+	const handleSelectTemplate = (templateContent: string) => {
+		if (!templateContent) return;
+		// Se já tiver texto digitado, concatena; senão, substitui.
+		setMessage((previous) =>
+			previous.trim()
+				? `${previous.trim()} ${templateContent}`.trim()
+				: templateContent
+		);
+	};
+
 	return (
 		<>
 			<div className="flex gap-2 p-4 border-t bg-background">
@@ -152,6 +172,24 @@ export function MessageInput({
 					disabled={sending || disabled || generatingAI}
 					className="flex-1"
 				/>
+				<Button
+					onClick={() => setTemplatesOpen(true)}
+					disabled={sending || disabled}
+					size="icon"
+					variant="outline"
+					title="Modelos de mensagem"
+				>
+					<FileText className="w-4 h-4" />
+				</Button>
+				<Button
+					onClick={() => setNotesOpen(true)}
+					disabled={sending || disabled}
+					size="icon"
+					variant="outline"
+					title="Anotações internas da conversa"
+				>
+					<StickyNote className="w-4 h-4" />
+				</Button>
 				<Button
 					onClick={handleGenerateWithAI}
 					disabled={sending || disabled || generatingAI}
@@ -191,6 +229,22 @@ export function MessageInput({
 				onOpenChange={setAiPromptOpen}
 				onSubmit={handleAiPromptSubmit}
 				loading={generatingAI}
+			/>
+
+			<ChatNotesDialog
+				contactId={contactId}
+				open={notesOpen}
+				onOpenChange={setNotesOpen}
+				currentUserId={storedUser?.id ?? ""}
+				currentUserName={effectiveUserName}
+			/>
+
+			<MessageTemplatesSheet
+				open={templatesOpen}
+				onOpenChange={setTemplatesOpen}
+				userId={storedUser?.id ?? ""}
+				mode="quick-insert"
+				onSelectTemplate={handleSelectTemplate}
 			/>
 		</>
 	);
