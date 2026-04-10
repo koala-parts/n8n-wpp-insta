@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 
+<<<<<<< HEAD
 const MANUAL_STAGE = "humano";
 
+=======
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 export async function POST(request: NextRequest) {
 	try {
 		const { phone, message, senderName, senderId, contactId } = await request.json();
@@ -59,13 +62,20 @@ export async function POST(request: NextRequest) {
 				typeof contactId === "string" && contactId.trim() ? contactId.trim() : "";
 
 			if (!messageContactId) {
+<<<<<<< HEAD
 				const { data: contactRowExact } = await supabase
 					.from("whatsapp_contacts")
 					.select("id, phone")
+=======
+				const { data: contactRow } = await supabase
+					.from("whatsapp_contacts")
+					.select("id")
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 					.eq("phone", normalizedPhone)
 					.limit(1)
 					.maybeSingle();
 
+<<<<<<< HEAD
 				if (contactRowExact?.id) {
 					messageContactId = String(contactRowExact.id);
 				} else {
@@ -81,6 +91,10 @@ export async function POST(request: NextRequest) {
 					if (matched?.id) {
 						messageContactId = String(matched.id);
 					}
+=======
+				if (contactRow?.id) {
+					messageContactId = String(contactRow.id);
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 				}
 			}
 
@@ -110,6 +124,7 @@ export async function POST(request: NextRequest) {
 				sender_type: normalizedSenderName,
 				message_type: "text",
 				content: message,
+<<<<<<< HEAD
 				stage: MANUAL_STAGE,
 				created_at: now,
 			});
@@ -171,6 +186,10 @@ export async function POST(request: NextRequest) {
 					});
 				}
 			}
+=======
+				created_at: now,
+			});
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 		} catch (dbError) {
 			console.error("Error saving message to database:", dbError);
 			// Don't fail the request if database save fails

@@ -1,6 +1,10 @@
 "use client";
 
+<<<<<<< HEAD
 import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
+=======
+import { useCallback, useEffect, useRef, useState } from "react";
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 import {
   LayoutDashboard,
   MessageSquare,
@@ -13,7 +17,10 @@ import {
   Trash2,
   Sun,
   Moon,
+<<<<<<< HEAD
   Instagram,
+=======
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -58,11 +65,18 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+<<<<<<< HEAD
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { MessageTemplatesSheet } from "@/app/(protected)/chats/components/message-templates-sheet";
 
 const mainItems = [
+=======
+import { toast } from "sonner";
+import { MessageTemplatesSheet } from "@/app/(protected)/chats/components/message-templates-sheet";
+
+const items = [
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
   {
     title: "Dashboard",
     url: "/dashboard",
@@ -76,12 +90,15 @@ const mainItems = [
     countKey: "myChats",
   },
   {
+<<<<<<< HEAD
     title: "Contatos",
     url: "/contatos",
     icon: Users,
     countKey: "contacts",
   },
   {
+=======
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
     title: "Chats do Bot",
     url: "/chats-bot",
     icon: Bot,
@@ -93,6 +110,7 @@ const mainItems = [
     icon: Users,
     countKey: "allChats",
   },
+<<<<<<< HEAD
   {
     title: "Instagram",
     url: "/instagram",
@@ -103,13 +121,21 @@ const mainItems = [
 ];
 
 type SidebarCountKey = "myChats" | "botChats" | "allChats" | "contacts" | "instagramHuman";
+=======
+];
+
+type SidebarCountKey = "myChats" | "botChats" | "allChats";
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 
 type SidebarChatCounts = {
   myChats: number;
   botChats: number;
   allChats: number;
+<<<<<<< HEAD
   contacts: number;
   instagramHuman: number;
+=======
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 };
 
 type User = {
@@ -128,10 +154,16 @@ type TransferNotification = {
   ownerUserId: string | null;
   contactPhone: string;
   stage: string;
+<<<<<<< HEAD
   type: "transfer" | "request" | "instagram-help";
   transferredAt: string | null;
   readKey: string;
   userIdInstagram?: string | null;
+=======
+  type: "transfer" | "request";
+  transferredAt: string | null;
+  readKey: string;
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 };
 
 type AssignmentRow = {
@@ -140,7 +172,10 @@ type AssignmentRow = {
   user_id?: string;
   transferred_by?: string;
   assigned_at?: string;
+<<<<<<< HEAD
   user_id_instagram?: string | null;
+=======
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
   users?: {
     id?: string;
     name?: string;
@@ -209,8 +244,11 @@ export function AppSidebar() {
     myChats: 0,
     botChats: 0,
     allChats: 0,
+<<<<<<< HEAD
     contacts: 0,
     instagramHuman: 0,
+=======
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
   });
   const [processingRequestKey, setProcessingRequestKey] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -281,11 +319,19 @@ export function AppSidebar() {
       const { data, error } = await supabase
         .from("user_active_contacts")
         .select(
+<<<<<<< HEAD
           "id, contact_id, user_id, transferred_by, assigned_at, user_id_instagram, users!user_active_contacts_transferred_by_fkey(id, name), whatsapp_contacts!user_active_contacts_contact_id_fkey(name, phone)"
         )
         .eq("user_id", user.id)
         .eq("active", true)
         .or("transferred_by.not.is.null,user_id_instagram.not.is.null")
+=======
+          "id, contact_id, user_id, transferred_by, assigned_at, users!user_active_contacts_transferred_by_fkey(id, name), whatsapp_contacts!user_active_contacts_contact_id_fkey(name, phone)"
+        )
+        .eq("user_id", user.id)
+        .eq("active", true)
+        .not("transferred_by", "is", null)
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
         .order("assigned_at", { ascending: false })
         .limit(50);
 
@@ -345,10 +391,15 @@ export function AppSidebar() {
 
       const mappedNotifications = rows
         .map((row, index) => {
+<<<<<<< HEAD
           const hasInstagramId = typeof row.user_id_instagram === "string" && row.user_id_instagram.trim() !== "";
           const contactId = typeof row.contact_id === "string" ? row.contact_id : "";
           
           if (!contactId && !hasInstagramId) return null;
+=======
+          const contactId = typeof row.contact_id === "string" ? row.contact_id : "";
+          if (!contactId) return null;
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 
           const rawAssignedAt =
             typeof row.assigned_at === "string" && row.assigned_at.trim() !== ""
@@ -356,12 +407,19 @@ export function AppSidebar() {
               : null;
 
           const fallbackId =
+<<<<<<< HEAD
             typeof row.id === "string" && row.id.trim() !== "" ? row.id : `${contactId || row.user_id_instagram}-${index}`;
           const readKey = `${fallbackId}:${rawAssignedAt ?? "-"}`;
           const latestEvent = requestEventByContact.get(contactId);
           const latestEventType = latestEvent?.isRequest ? "request" : "transfer";
 
           const type: "transfer" | "request" | "instagram-help" = hasInstagramId ? "instagram-help" : latestEventType;
+=======
+            typeof row.id === "string" && row.id.trim() !== "" ? row.id : `${contactId}-${index}`;
+          const readKey = `${fallbackId}:${rawAssignedAt ?? "-"}`;
+          const latestEvent = requestEventByContact.get(contactId);
+          const type: "transfer" | "request" = latestEvent?.isRequest ? "request" : "transfer";
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 
           const transferredById =
             typeof row.transferred_by === "string" && row.transferred_by.trim() !== ""
@@ -376,6 +434,7 @@ export function AppSidebar() {
 
           return {
             id: fallbackId,
+<<<<<<< HEAD
             contactId: contactId || "",
             contactName: hasInstagramId ? `Instagram: ${row.user_id_instagram}` : (
               typeof row.whatsapp_contacts?.name === "string" &&
@@ -383,6 +442,14 @@ export function AppSidebar() {
                 ? row.whatsapp_contacts.name.trim()
                 : "Contato sem nome"
             ),
+=======
+            contactId,
+            contactName:
+              typeof row.whatsapp_contacts?.name === "string" &&
+              row.whatsapp_contacts.name.trim() !== ""
+                ? row.whatsapp_contacts.name.trim()
+                : "Contato sem nome",
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
             transferredByName:
               typeof row.users?.name === "string" && row.users.name.trim() !== ""
                 ? row.users.name.trim()
@@ -394,14 +461,21 @@ export function AppSidebar() {
             type,
             transferredAt: rawAssignedAt,
             readKey,
+<<<<<<< HEAD
             userIdInstagram: hasInstagramId ? row.user_id_instagram : null,
+=======
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
           } as TransferNotification;
         })
         .filter((row): row is TransferNotification => row !== null);
 
+<<<<<<< HEAD
       const contactIds = mappedNotifications
         .map((notification) => notification.contactId)
         .filter((id): id is string => typeof id === "string" && id !== "");
+=======
+      const contactIds = mappedNotifications.map((notification) => notification.contactId);
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
       if (contactIds.length > 0) {
         const { data: sessionRows } = await supabase
           .from("whatsapp_sessions")
@@ -453,6 +527,7 @@ export function AppSidebar() {
     const supabase = createBrowserSupabase();
 
     try {
+<<<<<<< HEAD
       const [myChatsData, botChatsData, allChatsData, contactsResponse, instagramResponse] = await Promise.all([
         getMessagesData({ userId: user.id, supabase }),
         getBotChatsData(supabase),
@@ -471,12 +546,23 @@ export function AppSidebar() {
         : undefined;
       const instagramHumanCount = typeof instagramPayload?.count === "number" ? instagramPayload.count : 0;
 
+=======
+      const [myChatsData, botChatsData, allChatsData] = await Promise.all([
+        getMessagesData({ userId: user.id, supabase }),
+        getBotChatsData(supabase),
+        getAllChatsData(supabase),
+      ]);
+
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
       setChatCounts({
         myChats: myChatsData.contacts.length,
         botChats: botChatsData.length,
         allChats: allChatsData.length,
+<<<<<<< HEAD
         contacts: contactsCount,
         instagramHuman: instagramHumanCount,
+=======
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
       });
     } catch {
       // no-op
@@ -539,6 +625,7 @@ export function AppSidebar() {
         },
         scheduleRealtimeRefresh
       )
+<<<<<<< HEAD
       .on(
         "postgres_changes",
         {
@@ -548,6 +635,8 @@ export function AppSidebar() {
         },
         scheduleRealtimeRefresh
       )
+=======
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
       .subscribe();
 
     return () => {
@@ -595,11 +684,15 @@ export function AppSidebar() {
     saveReadNotifications(user.id, updatedReadKeys);
 
     setNotificationsOpen(false);
+<<<<<<< HEAD
     if (notification.type === "instagram-help") {
       router.push(`/instagram?userId=${notification.userIdInstagram}`);
     } else {
       router.push(`/chats-all/${notification.contactId}`);
     }
+=======
+    router.push(`/chats-all/${notification.contactId}`);
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
   };
 
   const handleApproveRequest = async (notification: TransferNotification) => {
@@ -708,6 +801,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
+<<<<<<< HEAD
           <SidebarGroupLabel>WhatsApp</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -734,6 +828,27 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Fragment>
+=======
+          <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={isItemActive(item.url)}>
+                    <Link href={item.url} aria-current={isItemActive(item.url) ? "page" : undefined}>
+                      <item.icon />
+                      <div className="flex w-full items-center justify-between gap-2">
+                        <span>{item.title}</span>
+                        {item.countKey ? (
+                          <span className="text-xs font-semibold tabular-nums">
+                            {formatCount(getMenuItemCount(item.countKey as SidebarCountKey | null) ?? 0)}
+                          </span>
+                        ) : null}
+                      </div>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
@@ -892,8 +1007,11 @@ export function AppSidebar() {
                         <p className="text-muted-foreground truncate text-xs leading-tight">
                           {notification.type === "request"
                             ? `${notification.transferredByName} solicitou a transferência`
+<<<<<<< HEAD
                             : notification.type === "instagram-help"
                             ? "Usuário do Instagram precisa de ajuda"
+=======
+>>>>>>> 350972b9f3027278e71bfe910b7388217e565218
                             : `Transferido por ${notification.transferredByName}`}
                         </p>
                         <p className="text-muted-foreground mt-1 text-xs">
