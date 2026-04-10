@@ -1,0 +1,114 @@
+import { CheckCircle2, Loader2, UserRoundSearch, Users } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+
+import type { TransferUser } from "@/hooks/use-chat-team";
+
+type ChatsTransferDialogProps = {
+  open: boolean;
+  activeContactName?: string;
+  loadingUsers: boolean;
+  transferUsers: TransferUser[];
+  selectedUserId: string;
+  transferring: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSelectUser: (userId: string) => void;
+  onTransfer: () => void;
+};
+
+export function ChatsTransferDialog({
+  open,
+  activeContactName,
+  loadingUsers,
+  transferUsers,
+  selectedUserId,
+  transferring,
+  onOpenChange,
+  onSelectUser,
+  onTransfer,
+}: ChatsTransferDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Transferir chat</DialogTitle>
+          <DialogDescription>
+            Selecione um usuário para transferir o chat de {activeContactName}.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="max-h-[320px] space-y-2 overflow-y-auto pr-1">
+          {loadingUsers ? (
+            <div className="text-muted-foreground flex items-center gap-2 rounded-md border px-3 py-3 text-sm">
+              <Loader2 className="size-4 animate-spin" />
+              Carregando usuários...
+            </div>
+          ) : transferUsers.length === 0 ? (
+            <div className="text-muted-foreground flex items-center gap-2 rounded-md border px-3 py-3 text-sm">
+              <UserRoundSearch className="size-4" />
+              Nenhum usuário elegível encontrado.
+            </div>
+          ) : (
+            transferUsers.map((user) => {
+              const isSelected = selectedUserId === user.id;
+
+              return (
+                <button
+                  key={user.id}
+                  type="button"
+                  onClick={() => onSelectUser(user.id)}
+                  className={cn(
+                    "hover:bg-muted/60 flex w-full items-center justify-between rounded-md border px-3 py-2.5 text-left transition-all",
+                    isSelected && "border-primary bg-primary/5 shadow-sm"
+                  )}
+                >
+                  <div>
+                    <p className="text-sm font-medium tracking-tight">{user.name}</p>
+                    <p className="text-muted-foreground text-xs">{user.email}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">{user.role}</Badge>
+                    {isSelected ? <CheckCircle2 className="size-4 text-primary" /> : null}
+                  </div>
+                </button>
+              );
+            })
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
+          <Button
+            type="button"
+            onClick={onTransfer}
+            disabled={loadingUsers || transferring || !selectedUserId}
+          >
+            {transferring ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Transferindo...
+              </>
+            ) : (
+              <>
+                <Users className="size-4" />
+                Transferir para usuário
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
