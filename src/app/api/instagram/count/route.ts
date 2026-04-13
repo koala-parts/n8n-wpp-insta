@@ -6,9 +6,10 @@ export async function GET() {
     const supabase = createServerSupabase();
 
     const { count: humanCount, error } = await supabase
-      .from("instagram_conversations")
+      .from("user_active_contacts")
       .select("*", { count: "exact", head: true })
-      .eq("stage", "HUMAN_ACTIVE");
+      .eq("active", true)
+      .not("user_id_instagram", "is", null);
 
     if (error) {
       throw error;
