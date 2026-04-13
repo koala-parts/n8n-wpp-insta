@@ -31,6 +31,7 @@ type InstagramViewProps = {
   onRefresh?: () => Promise<void>;
   onSelectContact?: (contactId: string) => void;
   onLoadMoreConversations?: () => void;
+  onMessageSent?: () => void;
   businessUsername?: string;
   title?: string;
   description?: string;
@@ -46,6 +47,7 @@ export default function InstagramView({
   onRefresh,
   onSelectContact,
   onLoadMoreConversations,
+  onMessageSent,
   businessUsername = "koalaparts",
   title = "Instagram",
   description = "Gerencie suas conversas do Instagram.",
@@ -261,6 +263,7 @@ export default function InstagramView({
                 contactId={activeContact.contactId}
                 igsid={activeContact.userIdInstagram ?? ""}
                 userName={userName}
+                onMessageSent={onMessageSent}
               />
             )}
           </section>

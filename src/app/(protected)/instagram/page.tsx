@@ -20,6 +20,8 @@ const InstagramPage = () => {
     loadInitial,
     loadMoreConversations,
     messagesByContact,
+    setActiveContact,
+    updateContactWithNewMessage,
   } = useInstagramPagination(businessUsername);
 
   useEffect(() => {
@@ -49,11 +51,21 @@ const InstagramPage = () => {
 
   const handleSelectContact = useCallback((contactId: string) => {
     setSelectedId(contactId);
-  }, []);
+    setActiveContact(contactId);
+  }, [setActiveContact]);
 
   const handleLoadMoreConversations = useCallback(() => {
     void loadMoreConversations();
   }, [loadMoreConversations]);
+
+  const handleMessageSent = useCallback(() => {
+    // Trigger polling to refresh messages immediately
+    const activeContactId = selectedId;
+    if (activeContactId) {
+      // Just trigger a quick refresh by reloading
+      void loadInitial();
+    }
+  }, [selectedId, loadInitial]);
 
   return (
     <PageContainer>
@@ -68,6 +80,7 @@ const InstagramPage = () => {
           onRefresh={handleRefresh}
           onSelectContact={handleSelectContact}
           onLoadMoreConversations={handleLoadMoreConversations}
+          onMessageSent={handleMessageSent}
           businessUsername={businessUsername}
         />
       </PageContent>
