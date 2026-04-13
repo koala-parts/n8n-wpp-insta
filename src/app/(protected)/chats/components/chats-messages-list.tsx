@@ -1,9 +1,5 @@
 import type { RefObject } from "react";
-<<<<<<< HEAD
 import { ExternalLink, List, MessageSquareOff, ShoppingCart } from "lucide-react";
-=======
-import { ExternalLink, List, ShoppingCart } from "lucide-react";
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 
 import type { ChatMessage } from "@/data/get-messages";
 import { formatDatePtBr } from "@/lib/formatters";
@@ -59,11 +55,7 @@ export function ChatsMessagesList({
   return (
     <div
       ref={messagesContainerRef}
-<<<<<<< HEAD
       className="min-h-0 min-w-0 flex-1 space-y-6 overflow-x-hidden overflow-y-auto bg-gradient-to-b from-background to-muted/20 px-5 py-6 pb-14 md:px-8"
-=======
-      className="min-h-0 min-w-0 flex-1 space-y-8 overflow-x-hidden overflow-y-auto px-7 py-10 pb-16 md:px-8"
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
     >
       {activeMessages.length > 0 ? (
         activeMessages.map((message) => {
@@ -73,9 +65,9 @@ export function ChatsMessagesList({
             normalizedContent.includes("transferiu para") ||
             normalizedContent.includes("transferiu a conversa para") ||
             normalizedContent.includes("finalizou a conversa") ||
-            normalizedContent.includes("solicitou transferência da conversa") ||
-            normalizedContent.includes("aprovou a solicitação de transferência") ||
-            normalizedContent.includes("recusou a solicitação de transferência");
+            normalizedContent.includes("solicitou transfer├¬ncia da conversa") ||
+            normalizedContent.includes("aprovou a solicita├º├úo de transfer├¬ncia") ||
+            normalizedContent.includes("recusou a solicita├º├úo de transfer├¬ncia");
 
           if (isSystemEvent) {
             return (
@@ -104,17 +96,11 @@ export function ChatsMessagesList({
             >
               <div
                 className={cn(
-<<<<<<< HEAD
                   "min-w-0 space-y-2.5 overflow-hidden rounded-xl border px-4 py-3 text-sm leading-normal shadow-sm",
                   cardsPayload ? "max-w-[96%] md:max-w-[92%]" : "max-w-[70%] md:max-w-[54%]",
                   isOwnMessage
                     ? "border-primary/40 bg-primary text-primary-foreground"
                     : "border-border bg-background"
-=======
-                  "min-w-0 space-y-2 overflow-hidden rounded-lg px-4 py-3 text-sm leading-normal",
-                  cardsPayload ? "max-w-[96%] md:max-w-[92%]" : "max-w-[70%] md:max-w-[54%]",
-                  isOwnMessage ? "bg-primary text-primary-foreground" : "bg-muted"
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
                 )}
               >
                 {quickReplyPayload ? (
@@ -144,7 +130,7 @@ export function ChatsMessagesList({
                               : "text-emerald-600 hover:bg-muted/60"
                           )}
                         >
-                          <span aria-hidden>↩</span>
+                          <span aria-hidden>Ôå®</span>
                           <span>{button.buttonText.displayText}</span>
                         </button>
                       ))}
@@ -171,7 +157,7 @@ export function ChatsMessagesList({
                       )}
                     >
                       <List className="size-4" />
-                      {interactivePayload.buttonText ?? "Ver opções"}
+                      {interactivePayload.buttonText ?? "Ver op├º├Áes"}
                     </button>
 
                     {interactivePayload.footerText ? (
@@ -205,7 +191,7 @@ export function ChatsMessagesList({
 
                           <div className="space-y-3 p-3">
                             <p className="line-clamp-2 text-base font-medium leading-snug">
-                              {card.message || "Sem descrição"}
+                              {card.message || "Sem descri├º├úo"}
                             </p>
 
                             {card.buttonUrl ? (
@@ -243,13 +229,13 @@ export function ChatsMessagesList({
                 ) : (
                   <p className="wrap-break-word whitespace-pre-wrap">
                     {message.content ??
-                      (message.messageType === "image" ? "[imagem]" : "[sem conteúdo]")}
+                      (message.messageType === "image" ? "[imagem]" : "[sem conte├║do]")}
                   </p>
                 )}
 
                 <div className="flex items-center gap-2 text-[10px] opacity-80">
                   <span>{senderLabel(message.senderType, message.senderName)}</span>
-                  <span>•</span>
+                  <span>ÔÇó</span>
                   <span>{formatDatePtBr(message.createdAt)}</span>
                 </div>
               </div>
@@ -257,15 +243,10 @@ export function ChatsMessagesList({
           );
         })
       ) : (
-<<<<<<< HEAD
         <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed py-10 text-center text-sm">
           <MessageSquareOff className="size-5" />
           <span>Este contato ainda não possui mensagens.</span>
           <span className="text-xs">Envie a primeira mensagem para iniciar o atendimento.</span>
-=======
-        <div className="text-muted-foreground py-8 text-center text-sm">
-          Este contato ainda não possui mensagens.
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
         </div>
       )}
     </div>

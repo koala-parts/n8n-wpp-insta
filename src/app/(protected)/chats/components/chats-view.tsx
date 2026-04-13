@@ -10,10 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-<<<<<<< HEAD
-=======
 import { Badge } from "@/components/ui/badge";
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import {
@@ -33,21 +30,15 @@ import { ChatsConversationHeader } from "./chats-conversation-header";
 import { ChatsMessagesList } from "./chats-messages-list";
 import { ChatsOptionsDialog } from "./chats-options-dialog";
 import { ChatsTransferDialog } from "./chats-transfer-dialog";
-<<<<<<< HEAD
-import { ConversationActions } from "./conversation-actions";
-import {
-  FINALIZED_STAGE,
-  type InteractiveMessagePayload,
-=======
 import {
   FINALIZED_STAGE,
   type InteractiveMessagePayload,
   getStageLabel,
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
   getStoredUserId,
   getStoredUserName,
   isFinalizedStage,
 } from "./chats-view.helpers";
+import { ConversationActions } from "./conversation-actions";
 import {
   ChatActionError,
   requestTransfer,
@@ -172,12 +163,9 @@ export default function ChatsView({
     : "-";
   const activeConversationFinalized = isFinalizedStage(activeStage);
   const activeAssignedUserId = activeContact?.assignedUserId ?? null;
-<<<<<<< HEAD
   const ownerBadgeUserId = viewMode === "my" ? userId || activeAssignedUserId : activeAssignedUserId;
   const ownerBadgeUserName =
     viewMode === "my" ? userName || activeContact?.assignedUserName || "Usuário" : activeContact?.assignedUserName;
-=======
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
   const isAssignedToCurrentUser =
     !activeAssignedUserId || (userId !== "" && activeAssignedUserId === userId);
   const canManageDirectly = viewMode === "my" || (viewMode === "all" && isAssignedToCurrentUser);
@@ -458,7 +446,6 @@ export default function ChatsView({
           </div>
 
           {activeContact ? (
-<<<<<<< HEAD
             <ConversationActions
               stage={activeStage}
               assignedUserId={ownerBadgeUserId}
@@ -474,62 +461,6 @@ export default function ChatsView({
               onTransfer={() => setTransferDialogOpen(true)}
               onRequestTransfer={handleRequestTransfer}
             />
-=======
-            <div className="flex items-center gap-2">
-              <Badge variant={activeConversationFinalized ? "default" : "outline"}>
-                {activeConversationFinalized
-                  ? "✓ Finalizado"
-                  : getStageLabel(activeStage)}
-              </Badge>
-
-              {canFinalizeDirectly ? (
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={handleFinalizeStage}
-                  disabled={finalizingStage || activeConversationFinalized}
-                >
-                  {finalizingStage ? (
-                    <>
-                      <Loader2 className="size-4 animate-spin" />
-                      Finalizando...
-                    </>
-                  ) : activeConversationFinalized ? (
-                    "Finalizado"
-                  ) : (
-                    "Finalizar"
-                  )}
-                </Button>
-              ) : null}
-
-              {canTransferDirectly ? (
-                <Button type="button" variant="outline" size="sm" onClick={() => setTransferDialogOpen(true)}>
-                  Transferir
-                </Button>
-              ) : null}
-
-              {canRequestTransfer ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleRequestTransfer}
-                  disabled={requestingTransfer || hasPendingTransferRequest}
-                >
-                  {requestingTransfer ? (
-                    <>
-                      <Loader2 className="size-4 animate-spin" />
-                      Solicitando...
-                    </>
-                  ) : hasPendingTransferRequest ? (
-                    "Solicitação enviada"
-                  ) : (
-                    "Solicitar transferência"
-                  )}
-                </Button>
-              ) : null}
-            </div>
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
           ) : null}
         </div>
       </CardHeader>

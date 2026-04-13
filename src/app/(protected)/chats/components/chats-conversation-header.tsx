@@ -3,11 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ChatContact } from "@/data/get-messages";
 import { toast } from "sonner";
-<<<<<<< HEAD
 import { Button } from "@/components/ui/button";
 import { BadgeCheck, Loader2, Tag } from "lucide-react";
-=======
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 
 type ChatsConversationHeaderProps = {
   activeContact: ChatContact;
@@ -109,20 +106,14 @@ export function ChatsConversationHeader({
     }
   };
 
-  return (
-<<<<<<< HEAD
-    <header className="border-b px-5 py-4 md:px-8">
-      <div className="flex items-start justify-between gap-3">
-=======
+return (
     <header className="border-b px-7 py-7 md:px-8 md:py-8">
       <div className="flex items-start justify-between gap-4">
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
         <div>
           <p className="font-medium">{activeContact.name}</p>
           <p className="text-muted-foreground text-xs">{activeContact.phone}</p>
         </div>
 
-<<<<<<< HEAD
         <Button
           type="button"
           variant={isLead ? "default" : "outline"}
@@ -148,17 +139,6 @@ export function ChatsConversationHeader({
             </>
           )}
         </Button>
-=======
-        <label className="flex cursor-pointer items-center gap-2 rounded-md border bg-background px-3 py-2 text-xs">
-          <input
-            type="checkbox"
-            checked={isLead}
-            disabled={loading || !normalizedPhone}
-            onChange={(e) => void handleToggleLead(e.target.checked)}
-          />
-          <span>Lead</span>
-        </label>
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
       </div>
     </header>
   );

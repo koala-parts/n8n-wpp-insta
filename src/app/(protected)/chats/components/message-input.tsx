@@ -3,11 +3,7 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-<<<<<<< HEAD
 import { FileText, Loader2, Send, Sparkles, StickyNote, Wand2 } from "lucide-react";
-=======
-import { FileText, Loader2, Send, StickyNote, Wand2 } from "lucide-react";
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 import { toast } from "sonner";
 import { AISuggestionsDialog } from "./ai-suggestions-dialog";
 import { AiPromptDialog } from "./ai-prompt-dialog";
@@ -157,7 +153,6 @@ export function MessageInput({
 
 	const handleSelectTemplate = (templateContent: string) => {
 		if (!templateContent) return;
-		// Se já tiver texto digitado, concatena; senão, substitui.
 		setMessage((previous) =>
 			previous.trim()
 				? `${previous.trim()} ${templateContent}`.trim()
@@ -167,7 +162,6 @@ export function MessageInput({
 
 	return (
 		<>
-<<<<<<< HEAD
 			<div className="border-t bg-background px-4 py-3">
 				<div className="mb-2 flex items-center justify-between gap-2">
 					<p className="text-muted-foreground text-xs">
@@ -179,91 +173,68 @@ export function MessageInput({
 					</div>
 				</div>
 				<div className="flex gap-2">
-=======
-			<div className="flex gap-2 p-4 border-t bg-background">
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
-				<Input
-					placeholder="Digite sua mensagem..."
-					value={message}
-					onChange={(e) => setMessage(e.target.value)}
-					onKeyDown={handleKeyDown}
-					disabled={sending || disabled || generatingAI}
-					className="flex-1"
-				/>
-				<Button
-					onClick={() => setTemplatesOpen(true)}
-					disabled={sending || disabled}
-					size="icon"
-					variant="outline"
-					title="Modelos de mensagem"
-<<<<<<< HEAD
-					aria-label="Abrir modelos de mensagem"
-=======
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
-				>
-					<FileText className="w-4 h-4" />
-				</Button>
-				<Button
-					onClick={() => setNotesOpen(true)}
-					disabled={sending || disabled}
-					size="icon"
-					variant="outline"
-					title="Anotações internas da conversa"
-<<<<<<< HEAD
-					aria-label="Abrir anotações da conversa"
-=======
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
-				>
-					<StickyNote className="w-4 h-4" />
-				</Button>
-				<Button
-					onClick={handleGenerateWithAI}
-					disabled={sending || disabled || generatingAI}
-					size="icon"
-					variant="outline"
-					title="Gerar com IA"
-<<<<<<< HEAD
-					aria-label="Gerar mensagem com IA"
-=======
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
-				>
-					{generatingAI ? (
-						<Loader2 className="w-4 h-4 animate-spin" />
-					) : (
-						<Wand2 className="w-4 h-4" />
-					)}
-				</Button>
-				<Button
-					onClick={handleSendMessage}
-					disabled={sending || disabled || !message.trim()}
-<<<<<<< HEAD
-					size="sm"
-					className="min-w-[96px]"
-					aria-label="Enviar mensagem"
-				>
-					{sending ? (
-						<>
+					<Input
+						placeholder="Digite sua mensagem..."
+						value={message}
+						onChange={(e) => setMessage(e.target.value)}
+						onKeyDown={handleKeyDown}
+						disabled={sending || disabled || generatingAI}
+						className="flex-1"
+					/>
+					<Button
+						onClick={() => setTemplatesOpen(true)}
+						disabled={sending || disabled}
+						size="icon"
+						variant="outline"
+						title="Modelos de mensagem"
+						aria-label="Abrir modelos de mensagem"
+					>
+						<FileText className="w-4 h-4" />
+					</Button>
+					<Button
+						onClick={() => setNotesOpen(true)}
+						disabled={sending || disabled}
+						size="icon"
+						variant="outline"
+						title="Anotações internas da conversa"
+						aria-label="Abrir anotações da conversa"
+					>
+						<StickyNote className="w-4 h-4" />
+					</Button>
+					<Button
+						onClick={handleGenerateWithAI}
+						disabled={sending || disabled || generatingAI}
+						size="icon"
+						variant="outline"
+						title="Gerar com IA"
+						aria-label="Gerar mensagem com IA"
+					>
+						{generatingAI ? (
 							<Loader2 className="w-4 h-4 animate-spin" />
-							Enviando...
-						</>
-					) : (
-						<>
-							<Send className="w-4 h-4" />
-							Enviar
-						</>
-					)}
-				</Button>
+						) : (
+							<Wand2 className="w-4 h-4" />
+						)}
+					</Button>
+					<Button
+						onClick={handleSendMessage}
+						disabled={sending || disabled || !message.trim()}
+						size="sm"
+						className="min-w-[96px]"
+						aria-label="Enviar mensagem"
+					>
+						{sending ? (
+							<>
+								<Loader2 className="w-4 h-4 animate-spin" />
+								Enviando...
+							</>
+						) : (
+							<>
+								<Send className="w-4 h-4" />
+								Enviar
+							</>
+						)}
+					</Button>
 				</div>
-=======
-					size="icon"
-				>
-					{sending ? (
-						<Loader2 className="w-4 h-4 animate-spin" />
-					) : (
-						<Send className="w-4 h-4" />
-					)}
-				</Button>
->>>>>>> 350972b9f3027278e71bfe910b7388217e565218
 			</div>
 
 			<AISuggestionsDialog
@@ -299,4 +270,3 @@ export function MessageInput({
 		</>
 	);
 }
-
