@@ -16,6 +16,7 @@ import {
 type ChatsMessagesListProps = {
   activeMessages: ChatMessage[];
   teamNames: ReadonlySet<string>;
+  contactName?: string;
   messagesContainerRef: RefObject<HTMLDivElement | null>;
   onOpenInteractiveOptions: (payload: InteractiveMessagePayload) => void;
 };
@@ -49,6 +50,7 @@ function getImageUrlFromMessageContent(content: string | null | undefined): stri
 export function ChatsMessagesList({
   activeMessages,
   teamNames,
+  contactName,
   messagesContainerRef,
   onOpenInteractiveOptions,
 }: ChatsMessagesListProps) {
@@ -85,9 +87,12 @@ export function ChatsMessagesList({
           const imageUrlFromContent = getImageUrlFromMessageContent(message.content);
           const senderValue = (message.senderName ?? message.senderType ?? "").trim();
           const normalizedSender = senderValue.toLowerCase();
-          const isOwnMessage =
-            normalizedSender === "bot" ||
-            (normalizedSender && teamNames.has(normalizedSender));
+          const isOwnMessage = message.direction === "inbound";
+
+          const displaySenderName =
+            message.direction === "inbound"
+              ? contactName || "Cliente"
+              : "Koala Parts";
 
           return (
             <div
@@ -234,8 +239,17 @@ export function ChatsMessagesList({
                 )}
 
                 <div className="flex items-center gap-2 text-[10px] opacity-80">
-                  <span>{senderLabel(message.senderType, message.senderName)}</span>
-                  <span>ÔÇó</span>
+                  {isOwnMessage ? (
+                    <>
+                      <span>Koala Parts</span>
+                      <span>•</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{contactName || "Cliente"}</span>
+                      <span>•</span>
+                    </>
+                  )}
                   <span>{formatDatePtBr(message.createdAt)}</span>
                 </div>
               </div>

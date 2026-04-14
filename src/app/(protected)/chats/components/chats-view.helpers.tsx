@@ -249,7 +249,12 @@ export function getStoredUserId() {
 }
 
 export function senderLabel(senderType: string, senderName?: string) {
-  return senderName?.trim() || senderType?.trim() || "-";
+  const name = senderName?.trim();
+  const type = senderType?.trim();
+  if (name && name !== "-") return name;
+  if (type === "bot" || type === "Bot") return "🤖 Bot";
+  if (type === "user" || type === "User") return "👤 Cliente";
+  return type || "-";
 }
 
 export function isFinalizedStage(stage: string | null | undefined) {

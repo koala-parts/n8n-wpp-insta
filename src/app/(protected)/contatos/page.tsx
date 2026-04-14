@@ -591,6 +591,7 @@ export default function ContactsPage() {
                     <ChatsMessagesList
                       activeMessages={activeMessages}
                       teamNames={teamNames}
+                      contactName={activeContact?.name}
                       messagesContainerRef={messagesContainerRef}
                       onOpenInteractiveOptions={handleOpenInteractiveOptions}
                     />
