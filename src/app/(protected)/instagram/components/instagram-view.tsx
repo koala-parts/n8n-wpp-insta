@@ -51,7 +51,7 @@ export default function InstagramView({
   businessUsername = "koalaparts",
   title = "Instagram",
   description = "Gerencie suas conversas do Instagram.",
-}) {
+}: InstagramViewProps) {
   const [search, setSearch] = useState("");
   const [internalSelectedId, setInternalSelectedId] = useState(
     contacts[0]?.contactId ?? ""

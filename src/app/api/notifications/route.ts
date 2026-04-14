@@ -17,10 +17,10 @@ export async function GET() {
       throw error;
     }
 
-    const notifications = (data ?? []).map((row) => ({
+    const notifications = (data ?? []).map((row: Record<string, unknown>) => ({
       id: row.id,
       contactId: row.id,
-      contactName: row.users?.name || row.user_id_instagram,
+      contactName: (row.users as { name?: string } | undefined)?.name || row.user_id_instagram,
       userIdInstagram: row.user_id_instagram,
       assignedAt: row.assigned_at,
       type: "instagram-help",
