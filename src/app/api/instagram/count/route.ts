@@ -15,11 +15,11 @@ export async function GET() {
       throw error;
     }
 
-    return NextResponse.json({ count: humanCount ?? 0 });
+    return NextResponse.json({ count: humanCount ?? 0, dms: humanCount ?? 0 });
   } catch (error) {
-    console.error("Error counting Instagram conversations:", error);
+    console.error("Error counting Instagram DMs:", error);
     return NextResponse.json(
-      { error: "Failed to count conversations" },
+      { error: "Failed to count DMs" },
       { status: 500 }
     );
   }

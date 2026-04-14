@@ -14,6 +14,11 @@ import {
   Sun,
   Moon,
   Instagram,
+  MessageCircle,
+  BotMessageSquare,
+  ContactRound,
+  MessagesSquare,
+  MessageCircleHeart,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -74,33 +79,26 @@ const mainItems = [
   {
     title: "Meus Chats",
     url: "/chats",
-    icon: MessageSquare,
+    icon: MessageCircle,
     countKey: "myChats",
   },
   {
     title: "Contatos",
     url: "/contatos",
-    icon: Users,
+    icon: ContactRound,
     countKey: "contacts",
   },
   {
     title: "Chats do Bot",
     url: "/chats-bot",
-    icon: Bot,
+    icon: BotMessageSquare,
     countKey: "botChats",
   },
   {
     title: "Todas as Conversas",
     url: "/chats-all",
-    icon: Users,
+    icon: MessagesSquare,
     countKey: "allChats",
-  },
-  {
-    title: "Instagram",
-    url: "/instagram",
-    icon: Instagram,
-    countKey: "instagramHuman",
-    isDivider: true,
   },
 ];
 
@@ -116,7 +114,9 @@ type SidebarChatCounts = {
   botChats: number;
   allChats: number;
   contacts: number;
-  instagramHuman: number;
+  dmsHuman: number;
+  commentsTotal: number;
+  pendingComments: number;
   [key: string]: number;
 };
 
@@ -142,6 +142,7 @@ type TransferNotification = {
   transferredAt: string | null;
   readKey: string;
   userIdInstagram?: string | null;
+  isComment?: boolean;
 };
 
 type AssignmentRow = {
@@ -194,7 +195,9 @@ export function AppSidebar() {
     botChats: 0,
     allChats: 0,
     contacts: 0,
-    instagramHuman: 0,
+    dmsHuman: 0,
+    commentsTotal: 0,
+    pendingComments: 0,
   });
 
   const [processingRequestKey, setProcessingRequestKey] = useState<string | null>(null);
@@ -254,23 +257,27 @@ export function AppSidebar() {
 
     const supabase = createBrowserSupabase();
 
-    const [my, bot, all, contactsRes, instaRes] = await Promise.all([
+    const [my, bot, all, contactsRes, instaRes, instaCountsRes] = await Promise.all([
       getMessagesData({ userId: user.id, supabase }),
       getBotChatsData(supabase),
       getAllChatsData(supabase),
       fetch("/api/contacts"),
       fetch("/api/instagram/count"),
+      fetch("/api/instagram/counts"),
     ]);
 
     const contacts = (await contactsRes.json())?.contacts?.length ?? 0;
-    const insta = (await instaRes.json())?.count ?? 0;
+    const dmsHuman = (await instaRes.json())?.dms ?? 0;
+    const instaCounts = (await instaCountsRes.json()) ?? { dms: 0, comments: 0, pending: 0 };
 
     setChatCounts({
       myChats: my.contacts.length,
       botChats: bot.length,
       allChats: all.length,
       contacts,
-      instagramHuman: insta,
+      dmsHuman: dmsHuman,
+      commentsTotal: instaCounts.comments ?? 0,
+      pendingComments: instaCounts.pending ?? 0,
     });
   }, [user?.id]);
 
@@ -355,10 +362,10 @@ export function AppSidebar() {
         })
         .filter((row): row is TransferNotification => row !== null);
 
-      // Instagram notifications (buscar nome do usuário via API)
+      // Instagram notifications (buscar nome do usuário via API e link do post)
       const { data: instaData, error: instaError } = await supabase
         .from("user_active_contacts")
-        .select("id, user_id, user_id_instagram, assigned_at")
+        .select("id, user_id, user_id_instagram, assigned_at, instagram_conversations!inner(user_name, link_url, thumbnail, comment)")
         .eq("active", true)
         .not("user_id_instagram", "is", null)
         .order("assigned_at", { ascending: false })
@@ -369,15 +376,22 @@ export function AppSidebar() {
       }
 
       const instaNotifications = await Promise.all(
-        (instaData ?? []).map(async (row) => {
+        (instaData ?? []).map(async (row: any) => {
+          const isComment = !!row.instagram_conversations?.comment;
+          const linkUrl = row.instagram_conversations?.link_url || "";
+          const thumbnail = row.instagram_conversations?.thumbnail || "";
+
           let instaName = row.user_id_instagram;
-          
-          try {
-            const profileRes = await fetch(`/api/instagram/profile?userId=${row.user_id_instagram}`);
-            const profileData = await profileRes.json();
-            instaName = profileData.username;
-          } catch {
-            // use fallback
+          if (isComment) {
+            instaName = row.instagram_conversations?.user_name || row.user_id_instagram;
+          } else {
+            try {
+              const profileRes = await fetch(`/api/instagram/profile?userId=${row.user_id_instagram}`);
+              const profileData = await profileRes.json();
+              instaName = profileData.username;
+            } catch {
+              // use fallback
+            }
           }
 
           return {
@@ -387,12 +401,13 @@ export function AppSidebar() {
             transferredByName: "",
             transferredById: null,
             ownerUserId: null,
-            contactPhone: "",
-            stage: "-",
+            contactPhone: linkUrl,
+            stage: isComment ? "-" : (thumbnail || "-"),
             type: "instagram-help" as const,
             transferredAt: row.assigned_at,
             readKey: `instagram-help:${row.id}`,
             userIdInstagram: row.user_id_instagram,
+            isComment,
           };
         })
       );
@@ -506,17 +521,24 @@ export function AppSidebar() {
   return (
     <>
       <Sidebar>
-        <SidebarHeader className="flex items-center justify-between px-6 py-4 border-b gap-2">
-          <Image src="/logo.png" alt="logo" width={40} height={40} />
-          <Button variant="ghost" onClick={() => setNotificationsOpen(true)} className="relative">
-            <Bell />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] text-white flex items-center justify-center">
-                {unreadCount > 9 ? "9+" : unreadCount}
-              </span>
-            )}
-          </Button>
-        </SidebarHeader>
+      <SidebarHeader className="flex items-center px-6 py-4 border-b">
+  <div className="flex items-center gap-30">
+    <Image src="/logo.png" alt="logo" width={40} height={40} />
+
+    <Button
+      variant="ghost"
+      onClick={() => setNotificationsOpen(true)}
+      className="relative"
+    >
+      <Bell />
+      {unreadCount > 0 && (
+        <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-green-500 text-[10px] text-white flex items-center justify-center">
+          {unreadCount > 9 ? "9+" : unreadCount}
+        </span>
+      )}
+    </Button>
+  </div>
+</SidebarHeader>
 
         <SidebarContent>
           <SidebarGroup>
@@ -524,27 +546,54 @@ export function AppSidebar() {
 
             <SidebarMenu>
               {mainItems.map((item, i) => (
-                <Fragment key={item.title}>
-                  {item.isDivider && <Separator />}
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isItemActive(item.url)}>
-                      <Link href={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                        {item.countKey && (
-                          <span className="ml-auto text-xs">
-                            {formatCount(chatCounts[item.countKey])}
-                          </span>
-                        )}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </Fragment>
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={isItemActive(item.url)}>
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                      {item.countKey && (
+                        <span className="ml-auto text-xs">
+                          {formatCount(chatCounts[item.countKey])}
+                        </span>
+                      )}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroup>
 
+          <SidebarGroup>
+            <SidebarGroupLabel>Instagram</SidebarGroupLabel>
+
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isItemActive("/instagram")}>
+                  <Link href="/instagram">
+                    <Instagram />
+                    <span>DMs</span>
+                    <span className="ml-auto text-xs">
+                      {formatCount(chatCounts.dmsHuman)}
+                    </span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isItemActive("/comentarios")}>
+                  <Link href="/comentarios">
+                    <MessageCircleHeart />
+                    <span>Comentarios</span>
+                    <span className="ml-auto text-xs">
+                      {formatCount(chatCounts.pendingComments)}
+                    </span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+
           <SidebarGroup className="mt-auto">
+          
             <SidebarMenu>
               <SidebarMenuItem>
                 <Link href="/help" className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-accent">
@@ -638,7 +687,11 @@ export function AppSidebar() {
                       >
                         {isInstagramHelp ? (
                           <div className="h-8 w-8 shrink-0 rounded-full bg-pink-100 dark:bg-pink-900 flex items-center justify-center">
-                            <Instagram className="h-4 w-4 text-pink-600 dark:text-pink-400" />
+                            {notification.isComment ? (
+                              <MessageCircleHeart className="h-4 w-4 text-pink-600 dark:text-pink-400" />
+                            ) : (
+                              <Instagram className="h-4 w-4 text-pink-600 dark:text-pink-400" />
+                            )}
                           </div>
                         ) : (
                           <ContactAvatar
@@ -652,7 +705,9 @@ export function AppSidebar() {
                           </p>
                           <p className="text-muted-foreground truncate text-xs leading-tight">
                             {isInstagramHelp
-                              ? "Precisa de ajuda"
+                              ? notification.isComment
+                                ? "Comentário"
+                                : "DM"
                               : notification.type === "request"
                               ? `${notification.transferredByName} solicitou a transferência`
                               : `Transferido por ${notification.transferredByName}`}

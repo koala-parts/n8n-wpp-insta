@@ -4,7 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import {
   PageContainer,
   PageContent,
+  PageHeader,
+  PageHeaderContent,
+  PageTitle,
 } from "@/components/ui/page-container";
+import { Badge } from "@/components/ui/badge";
 import InstagramView from "./components/instagram-view";
 import { useInstagramPagination } from "@/hooks/instagram/use-instagram-conversations";
 
@@ -69,6 +73,14 @@ const InstagramPage = () => {
 
   return (
     <PageContainer>
+      <PageHeader>
+        <PageHeaderContent>
+          <PageTitle>Instagram</PageTitle>
+          <Badge variant="secondary" className="ml-2">
+            {contacts.length} conversas
+          </Badge>
+        </PageHeaderContent>
+      </PageHeader>
       <PageContent>
         <InstagramView
           contacts={contacts}
