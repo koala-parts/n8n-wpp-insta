@@ -138,11 +138,12 @@ type TransferNotification = {
   ownerUserId: string | null;
   contactPhone: string;
   stage: string;
-  type: "transfer" | "request" | "instagram-help";
+  type: "transfer" | "request" | "instagram-help" | "instagram-dm-help" | "wpp-new-contact";
   transferredAt: string | null;
   readKey: string;
   userIdInstagram?: string | null;
   isComment?: boolean;
+  isDMWithoutComment?: boolean;
 };
 
 type AssignmentRow = {
@@ -377,12 +378,12 @@ export function AppSidebar() {
 
       const instaNotifications = await Promise.all(
         (instaData ?? []).map(async (row: any) => {
-          const isComment = !!row.instagram_conversations?.comment;
+          const hasComment = !!row.instagram_conversations?.comment;
           const linkUrl = row.instagram_conversations?.link_url || "";
           const thumbnail = row.instagram_conversations?.thumbnail || "";
 
           let instaName = row.user_id_instagram;
-          if (isComment) {
+          if (hasComment) {
             instaName = row.instagram_conversations?.user_name || row.user_id_instagram;
           } else {
             try {
@@ -394,6 +395,8 @@ export function AppSidebar() {
             }
           }
 
+          const isDMWithoutComment = !hasComment;
+
           return {
             id: row.id,
             contactId: row.id,
@@ -402,17 +405,43 @@ export function AppSidebar() {
             transferredById: null,
             ownerUserId: null,
             contactPhone: linkUrl,
-            stage: isComment ? "-" : (thumbnail || "-"),
-            type: "instagram-help" as const,
+            stage: hasComment ? "-" : (thumbnail || "-"),
+            type: isDMWithoutComment ? "instagram-dm-help" as const : "instagram-help" as const,
             transferredAt: row.assigned_at,
             readKey: `instagram-help:${row.id}`,
             userIdInstagram: row.user_id_instagram,
-            isComment,
+            isComment: hasComment,
+            isDMWithoutComment,
           };
         })
       );
 
-      const combined = [...transferNotifications, ...instaNotifications];
+      // WhatsApp notifications (user_id_instagram is null, transferred_by is null = novo contato)
+      const { data: wppData, error: wppError } = await supabase
+        .from("user_active_contacts")
+        .select("id, user_id, contact_id, assigned_at, whatsapp_contacts!user_active_contacts_contact_id_fkey(name, phone)")
+        .eq("user_id", user.id)
+        .eq("active", true)
+        .is("user_id_instagram", null)
+        .is("transferred_by", null)
+        .order("assigned_at", { ascending: false })
+        .limit(50);
+
+      const wppNotifications = (wppData ?? []).map((row: any) => ({
+        id: row.id,
+        contactId: row.id,
+        contactName: row.whatsapp_contacts?.name || "Novo contato",
+        transferredByName: "",
+        transferredById: null,
+        ownerUserId: null,
+        contactPhone: row.whatsapp_contacts?.phone || "",
+        stage: "-",
+        type: "wpp-new-contact" as const,
+        transferredAt: row.assigned_at,
+        readKey: `wpp-new:${row.id}`,
+      }));
+
+      const combined = [...transferNotifications, ...instaNotifications, ...wppNotifications];
 
       const filtered = combined.filter(
         (notification) => !dismissedKeys.has(notification.readKey)
@@ -444,7 +473,7 @@ export function AppSidebar() {
 
     setNotificationsOpen(false);
     
-    if (notification.type === "instagram-help") {
+    if (notification.type === "instagram-help" || notification.type === "instagram-dm-help") {
       router.push(`/instagram?contactId=${notification.contactId}`);
     } else {
       router.push(`/chats-all/${notification.contactId}`);
@@ -686,12 +715,23 @@ export function AppSidebar() {
                         className="flex w-full items-start gap-3 text-left"
                       >
                         {isInstagramHelp ? (
-                          <div className="h-8 w-8 shrink-0 rounded-full bg-pink-100 dark:bg-pink-900 flex items-center justify-center">
-                            {notification.isComment ? (
+                          <div className={cn(
+                            "h-8 w-8 shrink-0 rounded-full flex items-center justify-center",
+                            notification.isDMWithoutComment 
+                              ? "bg-green-100 dark:bg-green-900" 
+                              : "bg-pink-100 dark:bg-pink-900"
+                          )}>
+                            {notification.isDMWithoutComment ? (
+                              <MessagesSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
+                            ) : notification.isComment ? (
                               <MessageCircleHeart className="h-4 w-4 text-pink-600 dark:text-pink-400" />
                             ) : (
                               <Instagram className="h-4 w-4 text-pink-600 dark:text-pink-400" />
                             )}
+                          </div>
+                        ) : notification.type === "wpp-new-contact" ? (
+                          <div className="h-8 w-8 shrink-0 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                            <MessagesSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
                           </div>
                         ) : (
                           <ContactAvatar
@@ -705,9 +745,13 @@ export function AppSidebar() {
                           </p>
                           <p className="text-muted-foreground truncate text-xs leading-tight">
                             {isInstagramHelp
-                              ? notification.isComment
-                                ? "Comentário"
-                                : "DM"
+                              ? notification.isDMWithoutComment
+                                ? "DM - Precisa de ajuda"
+                                : notification.isComment
+                                  ? "Comentário"
+                                  : "DM"
+                              : notification.type === "wpp-new-contact"
+                              ? "Precisa de ajuda"
                               : notification.type === "request"
                               ? `${notification.transferredByName} solicitou a transferência`
                               : `Transferido por ${notification.transferredByName}`}
@@ -718,7 +762,7 @@ export function AppSidebar() {
                             </p>
                           )}
                         </div>
-                        {!isRead && !isInstagramHelp && (
+                        {!isRead && (isInstagramHelp || notification.type === "wpp-new-contact") && (
                           <Badge variant="default" className="ml-2 shrink-0">
                             Novo
                           </Badge>
